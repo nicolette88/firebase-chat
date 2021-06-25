@@ -22,8 +22,8 @@ function displayMessage(message) {
       <i class="fas fa-user"></i>
       <div>
         <span class="username">${message.username}
-          <time>20:12 PM</time>
-        </span>
+          <time>${(message.date.toDate()).toLocaleString('hu-HU')}</time >
+        </span >
         <br>
         <span class="message-text">${message.message}
         </span>
@@ -32,8 +32,8 @@ function displayMessage(message) {
         <i class="fas fa-trash-alt"></i>
         <i class="fas fa-pen"></i>
       </div>
-    </div>
-`;
+    </div >
+  `;
   document.querySelector('#messages').insertAdjacentHTML('beforeend', messageDOM);
   scrollIntoView(document.querySelector('#messages'), {
     scrollMode: 'if-needed',
