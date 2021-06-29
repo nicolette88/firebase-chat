@@ -2,6 +2,7 @@
 @import 'variables';
 @import './messages-component';
 @import './message-send-component';
+@import './edit-message-popup';
 
 body {
 	background: $dark-gradient;

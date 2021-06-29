@@ -62,6 +62,53 @@ function displayMessage(message, id) {
     deleteMessage(id);
     removeMessage(id);
   });
+  // popup megnyitása
+  document.querySelector(`[data-id="${id}"] .fa-pen`).addEventListener('click', () => {
+    console.log('popup open');
+    displayEditMessage(id);
+  });
+}
+
+function displayEditMessage(id) {
+  console.log('displayEditMessage');
+  const markup = /*html*/`
+  <div class="popup-container" id="popup">
+    <div class="edit-message" id="edit-message" data-id="${id}">
+      <div id="close-popup" class="button">
+        Close <i class="fa fa-window-close" aria-hidden="true"></i>
+      </div>
+      <textarea id="edit" name="" cols="30" rows="10">${document.querySelector(`.message[data-id="${id}"] .message-text`).textContent.trim()
+    }</textarea>
+      <div id="save-message" class="button">
+        Save message<i class="fas fa-save"></i>
+      </div>
+    </div>
+  </div>
+`;
+
+  if (document.querySelector(`[data-id="${id}"]`) !== null) {
+    document.getElementById('app').insertAdjacentHTML('beforeend', markup);
+  }
+
+  document.querySelector(`#edit-message #close-popup .fa-window-close`).addEventListener('click', () => {
+    console.log('close');
+
+    document.getElementById('popup').remove();
+  });
+
+  document.querySelector(`#save-message .fa-save`).addEventListener('click', () => {
+    console.log('save');
+    const newMessage = document.getElementById('edit').value;
+    document.querySelector(`.message[data-id="${id}"] .message-text`).textContent = newMessage;
+    console.log(newMessage);
+    modifyMessage(id, newMessage);
+  });
+}
+
+async function modifyMessage(id, newMessage) {
+  db.collection('messages').doc(id).update({
+    message: newMessage
+  });
 }
 
 function createMessage() {
