@@ -16,9 +16,28 @@ async function sendMessage(data) {
   console.log(res);
 }
 
-function displayMessage(message) {
+function removeMessage(id) {
+  console.log("removeMessage: " + id);
+  const htmlElement = document.querySelector(`[data-id="${id}"]`);
+  console.log(htmlElement);
+  if (htmlElement !== null) {
+    htmlElement.remove();
+  }
+}
+
+function deleteMessage(id) {
+  console.log("deleteMessage: " + id);
+  // Netes példakódból kimásoltam a hibaellenőrzésre vonatkozó kódot:
+  db.collection("messages").doc(id).delete().then(() => {
+    console.log("Document successfully deleted!");
+  }).catch((error) => {
+    console.error("Error removing document: ", error);
+  });
+}
+
+function displayMessage(message, id) {
   const messageDOM = `
-    <div class="message">
+    <div class="message" data-id="${id}">
       <i class="fas fa-user"></i>
       <div>
         <span class="username">${message.username}
@@ -39,6 +58,10 @@ function displayMessage(message) {
     scrollMode: 'if-needed',
     block: 'end'
   });
+  document.querySelector(`[data-id="${id}"] .fa-trash-alt`).addEventListener('click', () => {
+    deleteMessage(id);
+    removeMessage(id);
+  });
 }
 
 function createMessage() {
@@ -52,7 +75,7 @@ function createMessage() {
 async function displayAllMessages() {
   const query = await db.collection('messages').orderBy('date', 'asc').get();
   query.forEach((doc) => {
-    displayMessage(doc.data());
+    displayMessage(doc.data(), doc.id);
   });
 }
 
@@ -84,13 +107,14 @@ db.collection('messages').orderBy('date', 'asc')
   .onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
-        displayMessage(change.doc.data());
+        displayMessage(change.doc.data(), change.doc.id);
       }
       if (change.type === 'modified') {
         console.log('Modified message: ', change.doc.data());
       }
       if (change.type === 'removed') {
         console.log('Removed message: ', change.doc.data());
+        removeMessage(change.doc.id);
       }
     });
   });
